@@ -1,0 +1,56 @@
+{
+  "applications": "*",
+  "changelogDate": "20221219122144",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "currency",
+  "fields": [
+    {
+      "fieldName": "code",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "ccy",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "ccyNmRU",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "ccyNmUZ",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "ccyNmUZC",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "ccyNmEN",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "nominal",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "rate",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "diff",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "date",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Currency",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "service": "serviceImpl"
+}

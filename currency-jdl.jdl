@@ -1,0 +1,16 @@
+
+entity Currency {
+    Code String
+    Ccy  String
+    CcyNmRU String
+    CcyNmUZ String
+    CcyNmUZC String
+    CcyNmEN String
+    Nominal String
+    Rate String
+    Diff String
+    Date String
+}
+dto * with mapstruct
+paginate * with pagination
+service * with serviceImpl
