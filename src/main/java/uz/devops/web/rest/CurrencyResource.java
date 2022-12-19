@@ -1,6 +1,5 @@
 package uz.devops.web.rest;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
@@ -8,19 +7,21 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
+import uz.devops.domain.Currency;
 import uz.devops.repository.CurrencyRepository;
 import uz.devops.service.CurrencyService;
 import uz.devops.service.dto.CurrencyDTO;
+import uz.devops.service.mapper.CurrencyMapper;
 import uz.devops.web.rest.errors.BadRequestAlertException;
 
 /**
@@ -36,12 +37,14 @@ public class CurrencyResource {
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
+    private final CurrencyMapper currencyMapper;
 
     private final CurrencyService currencyService;
 
     private final CurrencyRepository currencyRepository;
 
-    public CurrencyResource(CurrencyService currencyService, CurrencyRepository currencyRepository) {
+    public CurrencyResource(CurrencyMapper currencyMapper, CurrencyService currencyService, CurrencyRepository currencyRepository) {
+        this.currencyMapper = currencyMapper;
         this.currencyService = currencyService;
         this.currencyRepository = currencyRepository;
     }
@@ -49,21 +52,21 @@ public class CurrencyResource {
     /**
      * {@code POST  /currencies} : Create a new currency.
      *
-     * @param currencyDTO the currencyDTO to create.
+     //* @param  currencyDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new currencyDTO, or with status {@code 400 (Bad Request)} if the currency has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/currencies")
-    public ResponseEntity<CurrencyDTO> createCurrency(@RequestBody CurrencyDTO currencyDTO) throws URISyntaxException {
-        log.debug("REST request to save Currency : {}", currencyDTO);
-        if (currencyDTO.getId() != null) {
-            throw new BadRequestAlertException("A new currency cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        CurrencyDTO result = currencyService.save(currencyDTO);
-        return ResponseEntity
-            .created(new URI("/api/currencies/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+    public ResponseEntity<CurrencyDTO> createCurrency() throws URISyntaxException {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<Currency> currencyList;
+        currencyList = restTemplate.exchange("https://cbu.uz/oz/arkhiv-kursov-valyut/json/", HttpMethod.GET, entity, new ParameterizedTypeReference<List<Currency>>() {}).getBody();
+        System.out.println(currencyList);
+        currencyRepository.saveAll(currencyList);
+        return  null;
     }
 
     /**

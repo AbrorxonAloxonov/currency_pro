@@ -1,5 +1,7 @@
 package uz.devops.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import javax.persistence.*;
 
@@ -20,32 +22,41 @@ public class Currency implements Serializable {
     private Long id;
 
     @Column(name = "code")
+    @JsonProperty("Code")
     private String code;
 
     @Column(name = "ccy")
+    @JsonProperty("Ccy")
     private String ccy;
 
+    @JsonProperty("CcyNm_RU")
     @Column(name = "ccy_nm_ru")
     private String ccyNmRU;
 
+    @JsonProperty("CcyNm_UZ")
     @Column(name = "ccy_nm_uz")
     private String ccyNmUZ;
 
+    @JsonProperty("CcyNm_UZC")
     @Column(name = "ccy_nm_uzc")
     private String ccyNmUZC;
-
+    @JsonProperty("CcyNm_EN")
     @Column(name = "ccy_nm_en")
     private String ccyNmEN;
 
     @Column(name = "nominal")
+    @JsonProperty("Nominal")
     private String nominal;
 
+    @JsonProperty("Rate")
     @Column(name = "rate")
     private String rate;
 
+    @JsonProperty("Diff")
     @Column(name = "diff")
     private String diff;
 
+    @JsonProperty("Date")
     @Column(name = "date")
     private String date;
 

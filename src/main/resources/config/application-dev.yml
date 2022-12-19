@@ -32,9 +32,9 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/currency_pro
-    username: currency_pro
-    password:
+    url: jdbc:postgresql://localhost:5432/jhipster
+    username: postgres
+    password: 7949
     hikari:
       poolName: Hikari
       auto-commit: false
