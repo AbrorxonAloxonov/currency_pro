@@ -20,7 +20,10 @@ import tech.jhipster.web.util.ResponseUtil;
 import uz.devops.domain.Currency;
 import uz.devops.repository.CurrencyRepository;
 import uz.devops.service.CurrencyService;
+import uz.devops.service.CurrencyServiceResolvers;
 import uz.devops.service.dto.CurrencyDTO;
+import uz.devops.service.dto.CurrencyRequestDTO;
+import uz.devops.service.dto.ResponseDto;
 import uz.devops.service.mapper.CurrencyMapper;
 import uz.devops.web.rest.errors.BadRequestAlertException;
 
@@ -42,11 +45,13 @@ public class CurrencyResource {
     private final CurrencyService currencyService;
 
     private final CurrencyRepository currencyRepository;
+    private final CurrencyServiceResolvers currencyServiceResolvers;
 
-    public CurrencyResource(CurrencyMapper currencyMapper, CurrencyService currencyService, CurrencyRepository currencyRepository) {
+    public CurrencyResource(CurrencyMapper currencyMapper, CurrencyService currencyService, CurrencyRepository currencyRepository, CurrencyServiceResolvers currencyServiceResolvers) {
         this.currencyMapper = currencyMapper;
         this.currencyService = currencyService;
         this.currencyRepository = currencyRepository;
+        this.currencyServiceResolvers = currencyServiceResolvers;
     }
 
     /**
@@ -57,16 +62,23 @@ public class CurrencyResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/currencies")
-    public ResponseEntity<CurrencyDTO> createCurrency() throws URISyntaxException {
+    public ResponseDto<List<CurrencyDTO>> createCurrency() throws URISyntaxException {
         RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-        List<Currency> currencyList;
-        currencyList = restTemplate.exchange("https://cbu.uz/oz/arkhiv-kursov-valyut/json/", HttpMethod.GET, entity, new ParameterizedTypeReference<List<Currency>>() {}).getBody();
-        System.out.println(currencyList);
-        currencyRepository.saveAll(currencyList);
-        return  null;
+        log.debug("Information is being fetched from Cbu.uz site");
+        List<CurrencyDTO> currencyDtos = restTemplate
+            .exchange("https://cbu.uz/oz/arkhiv-kursov-valyut/json/",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<CurrencyDTO>>() {}
+             ).getBody();
+        log.debug("transferred to the service for storage");
+        currencyDtos = currencyService.saveAll(currencyDtos);
+        if (currencyDtos == null){
+            log.debug("Not save");
+            return new ResponseDto<>(false,"not saved");
+        }
+        log.debug("save");
+        return new ResponseDto<>(true,"save",currencyDtos);
     }
 
     /**
@@ -151,6 +163,16 @@ public class CurrencyResource {
         Page<CurrencyDTO> page = currencyService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+    @GetMapping("/currenciesCcy/{ccy}")
+    public ResponseDto<List<CurrencyDTO>> getAllCurrenciesByBankName(@PathVariable String ccy){
+        log.debug("Search by ccy");
+        return currencyServiceResolvers.findByCcy(ccy);
+    }
+    @GetMapping("/currency")
+    public ResponseDto<List<Currency>> getAllByCurrency(@RequestBody CurrencyRequestDTO currencyRequestDTO){
+        log.debug("start resolveGetCurrencyService");
+        return currencyServiceResolvers.resolveGetCurrencyService(currencyRequestDTO);
     }
 
     /**

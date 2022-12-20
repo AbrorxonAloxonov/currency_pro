@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate, getSortState, JhiPagination, JhiItemCount } from 'react-jhipster';
+import { Translate, TextFormat, getSortState, JhiPagination, JhiItemCount } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
@@ -153,7 +153,7 @@ export const Currency = () => {
                   <td>{currency.nominal}</td>
                   <td>{currency.rate}</td>
                   <td>{currency.diff}</td>
-                  <td>{currency.date}</td>
+                  <td>{currency.date ? <TextFormat type="date" value={currency.date} format={APP_DATE_FORMAT} /> : null}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`/currency/${currency.id}`} color="info" size="sm" data-cy="entityDetailsButton">

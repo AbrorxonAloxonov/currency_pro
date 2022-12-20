@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export interface ICurrency {
   id?: number;
   code?: string | null;

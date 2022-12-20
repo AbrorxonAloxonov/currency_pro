@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
-import {} from 'react-jhipster';
+import { TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
@@ -67,7 +67,7 @@ export const CurrencyDetail = () => {
           <dt>
             <span id="date">Date</span>
           </dt>
-          <dd>{currencyEntity.date}</dd>
+          <dd>{currencyEntity.date ? <TextFormat value={currencyEntity.date} type="date" format={APP_DATE_FORMAT} /> : null}</dd>
         </dl>
         <Button tag={Link} to="/currency" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Orqaga</span>

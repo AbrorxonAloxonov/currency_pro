@@ -1,5 +1,6 @@
 package uz.devops.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,15 @@ public class CurrencyServiceImpl implements CurrencyService {
         Currency currency = currencyMapper.toEntity(currencyDTO);
         currency = currencyRepository.save(currency);
         return currencyMapper.toDto(currency);
+    }
+
+    @Override
+    public List<CurrencyDTO> saveAll(List<CurrencyDTO> currencyDTO) {
+        List<Currency> currencyList = currencyDTO.stream()
+            .map(currencyMapper::toEntity)
+            .toList();
+        currencyRepository.saveAll(currencyList);
+        return currencyDTO;
     }
 
     @Override

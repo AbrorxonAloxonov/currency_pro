@@ -3,6 +3,7 @@ package uz.devops.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
+import java.time.Instant;
 import javax.persistence.*;
 
 /**
@@ -58,7 +59,7 @@ public class Currency implements Serializable {
 
     @JsonProperty("Date")
     @Column(name = "date")
-    private String date;
+    private Instant date;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -192,16 +193,16 @@ public class Currency implements Serializable {
         this.diff = diff;
     }
 
-    public String getDate() {
+    public Instant getDate() {
         return this.date;
     }
 
-    public Currency date(String date) {
+    public Currency date(Instant date) {
         this.setDate(date);
         return this;
     }
 
-    public void setDate(String date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

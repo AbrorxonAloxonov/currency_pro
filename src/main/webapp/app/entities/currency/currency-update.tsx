@@ -43,6 +43,8 @@ export const CurrencyUpdate = () => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    values.date = convertDateTimeToServer(values.date);
+
     const entity = {
       ...currencyEntity,
       ...values,
@@ -57,9 +59,12 @@ export const CurrencyUpdate = () => {
 
   const defaultValues = () =>
     isNew
-      ? {}
+      ? {
+          date: displayDefaultDateTime(),
+        }
       : {
           ...currencyEntity,
+          date: convertDateTimeFromServer(currencyEntity.date),
         };
 
   return (
@@ -87,7 +92,14 @@ export const CurrencyUpdate = () => {
               <ValidatedField label="Nominal" id="currency-nominal" name="nominal" data-cy="nominal" type="text" />
               <ValidatedField label="Rate" id="currency-rate" name="rate" data-cy="rate" type="text" />
               <ValidatedField label="Diff" id="currency-diff" name="diff" data-cy="diff" type="text" />
-              <ValidatedField label="Date" id="currency-date" name="date" data-cy="date" type="text" />
+              <ValidatedField
+                label="Date"
+                id="currency-date"
+                name="date"
+                data-cy="date"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/currency" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

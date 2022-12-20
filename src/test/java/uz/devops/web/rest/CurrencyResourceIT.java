@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -58,8 +60,8 @@ class CurrencyResourceIT {
     private static final String DEFAULT_DIFF = "AAAAAAAAAA";
     private static final String UPDATED_DIFF = "BBBBBBBBBB";
 
-    private static final String DEFAULT_DATE = "AAAAAAAAAA";
-    private static final String UPDATED_DATE = "BBBBBBBBBB";
+    private static final Instant DEFAULT_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/currencies";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -194,7 +196,7 @@ class CurrencyResourceIT {
             .andExpect(jsonPath("$.[*].nominal").value(hasItem(DEFAULT_NOMINAL)))
             .andExpect(jsonPath("$.[*].rate").value(hasItem(DEFAULT_RATE)))
             .andExpect(jsonPath("$.[*].diff").value(hasItem(DEFAULT_DIFF)))
-            .andExpect(jsonPath("$.[*].date").value(hasItem(DEFAULT_DATE)));
+            .andExpect(jsonPath("$.[*].date").value(hasItem(DEFAULT_DATE.toString())));
     }
 
     @Test
@@ -218,7 +220,7 @@ class CurrencyResourceIT {
             .andExpect(jsonPath("$.nominal").value(DEFAULT_NOMINAL))
             .andExpect(jsonPath("$.rate").value(DEFAULT_RATE))
             .andExpect(jsonPath("$.diff").value(DEFAULT_DIFF))
-            .andExpect(jsonPath("$.date").value(DEFAULT_DATE));
+            .andExpect(jsonPath("$.date").value(DEFAULT_DATE.toString()));
     }
 
     @Test

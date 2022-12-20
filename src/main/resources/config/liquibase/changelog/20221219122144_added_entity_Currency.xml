@@ -41,11 +41,12 @@
             <column name="diff" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="date" type="varchar(255)">
+            <column name="date" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
+        <dropDefaultValue tableName="currency" columnName="date" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -74,7 +75,7 @@
             <column name="nominal" type="string"/>
             <column name="rate" type="string"/>
             <column name="diff" type="string"/>
-            <column name="date" type="string"/>
+            <column name="date" type="date"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

@@ -43,7 +43,7 @@
     },
     {
       "fieldName": "date",
-      "fieldType": "String"
+      "fieldType": "Instant"
     }
   ],
   "fluentMethods": true,
