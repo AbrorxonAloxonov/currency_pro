@@ -42,12 +42,25 @@ public class CurrencyServiceResolvers implements CommonService{
     }
 
     public ResponseDto<List<Currency>> resolveGetCurrencyService(CurrencyRequestDTO currencyRequestDTO) {
-        BankName bankName = BankName.valueOf(currencyRequestDTO.getName());
-        String date = currencyRequestDTO.getDate();
-        CurrencyDTO currencyDTO = new CurrencyDTO();
-        currencyDTO.setDate(date);
-        log.debug("currencyDto toEntity");
-        Currency currency = currencyMapper.toEntity(currencyDTO);
+        BankName bankName;
+        Currency currency;
+        try{
+            bankName = BankName.valueOf(currencyRequestDTO.getName().toUpperCase());
+            String date = currencyRequestDTO.getDate();
+            CurrencyDTO currencyDTO = new CurrencyDTO();
+            currencyDTO.setDate(date);
+            log.debug("currencyDto toEntity");
+            currency = currencyMapper.toEntity(currencyDTO);
+        }catch (IllegalArgumentException e){
+            return new ResponseDto<>(false, "There is no bank with such a name");
+        }catch (NullPointerException e){
+            return new ResponseDto<>(false,"data not available");
+        }
+        catch (Exception e){
+            return new ResponseDto<>(false,"Unexpected error");
+        }
+
+
         log.debug("start resolveGetCurrencyService method");
         if (!currencyServiceMap.containsKey(bankName)) {
             log.debug("no information found");
