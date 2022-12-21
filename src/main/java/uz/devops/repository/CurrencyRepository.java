@@ -12,7 +12,7 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface CurrencyRepository extends JpaRepository<Currency, Long> {
+public interface CurrencyRepository extends JpaRepository<Currency, Long>, JpaSpecificationExecutor<Currency> {
     List<Currency> findByDate(Instant date);
     List<Currency> findByCcy(String ccy);
 }

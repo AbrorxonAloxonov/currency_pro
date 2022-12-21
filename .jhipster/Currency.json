@@ -47,10 +47,10 @@
     }
   ],
   "fluentMethods": true,
-  "jpaMetamodelFiltering": false,
+  "jpaMetamodelFiltering": true,
   "name": "Currency",
   "pagination": "pagination",
   "readOnly": false,
   "relationships": [],
-  "service": "serviceImpl"
+  "service": "serviceClass"
 }

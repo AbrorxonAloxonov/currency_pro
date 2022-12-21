@@ -2,6 +2,7 @@ package uz.devops.service;
 
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uz.devops.domain.Currency;
@@ -13,16 +14,13 @@ import java.time.Instant;
 import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class CbuService implements CommonService {
 
     private final CurrencyRepository currencyRepository;
     private final CurrencyMapper currencyMapper;
 
-    public CbuService(CurrencyRepository currencyRepository, CurrencyMapper currencyMapper) {
-        this.currencyRepository = currencyRepository;
-        this.currencyMapper = currencyMapper;
-    }
 
     @Override
     public ResponseDto<List<Currency>> getCurrencies(Instant date) {

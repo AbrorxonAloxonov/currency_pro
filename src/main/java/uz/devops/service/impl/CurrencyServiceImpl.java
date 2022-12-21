@@ -19,7 +19,7 @@ import uz.devops.service.mapper.CurrencyMapper;
  */
 @Service
 @Transactional
-public class CurrencyServiceImpl implements CurrencyService {
+public class CurrencyServiceImpl extends CurrencyService {
 
     private final Logger log = LoggerFactory.getLogger(CurrencyServiceImpl.class);
 
@@ -28,6 +28,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     private final CurrencyMapper currencyMapper;
 
     public CurrencyServiceImpl(CurrencyRepository currencyRepository, CurrencyMapper currencyMapper) {
+        super(currencyRepository, currencyMapper);
         this.currencyRepository = currencyRepository;
         this.currencyMapper = currencyMapper;
     }
@@ -39,8 +40,6 @@ public class CurrencyServiceImpl implements CurrencyService {
         currency = currencyRepository.save(currency);
         return currencyMapper.toDto(currency);
     }
-
-    @Override
     public List<CurrencyDTO> saveAll(List<CurrencyDTO> currencyDTO) {
         List<Currency> currencyList = currencyDTO.stream()
             .map(currencyMapper::toEntity)

@@ -2,38 +2,88 @@ package uz.devops.service;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import uz.devops.domain.Currency;
+import uz.devops.repository.CurrencyRepository;
 import uz.devops.service.dto.CurrencyDTO;
+import uz.devops.service.mapper.CurrencyMapper;
 
 /**
- * Service Interface for managing {@link uz.devops.domain.Currency}.
+ * Service Implementation for managing {@link Currency}.
  */
-public interface CurrencyService {
+@Service
+@Transactional
+public class CurrencyService {
+
+    private final Logger log = LoggerFactory.getLogger(CurrencyService.class);
+
+    private CurrencyRepository currencyRepository;
+
+    private final CurrencyMapper currencyMapper;
+
+    public CurrencyService(CurrencyRepository currencyRepository, CurrencyMapper currencyMapper) {
+        this.currencyRepository = currencyRepository;
+        this.currencyMapper = currencyMapper;
+    }
+
     /**
      * Save a currency.
      *
      * @param currencyDTO the entity to save.
      * @return the persisted entity.
      */
-    CurrencyDTO save(CurrencyDTO currencyDTO);
-    List<CurrencyDTO> saveAll(List<CurrencyDTO> currencyDTO);
+    public CurrencyDTO save(CurrencyDTO currencyDTO) {
+        log.debug("Request to save Currency : {}", currencyDTO);
+        Currency currency = currencyMapper.toEntity(currencyDTO);
+        currency = currencyRepository.save(currency);
+        return currencyMapper.toDto(currency);
+    }
+    public List<CurrencyDTO> saveAll(List<CurrencyDTO> currencyDTO) {
+        List<Currency> currencyList = currencyDTO.stream()
+            .map(currencyMapper::toEntity)
+            .toList();
+        currencyRepository.saveAll(currencyList);
+        return currencyDTO;
+    }
 
     /**
-     * Updates a currency.
+     * Update a currency.
      *
-     * @param currencyDTO the entity to update.
+     * @param currencyDTO the entity to save.
      * @return the persisted entity.
      */
-    CurrencyDTO update(CurrencyDTO currencyDTO);
+    public CurrencyDTO update(CurrencyDTO currencyDTO) {
+        log.debug("Request to update Currency : {}", currencyDTO);
+        Currency currency = currencyMapper.toEntity(currencyDTO);
+        currency = currencyRepository.save(currency);
+        return currencyMapper.toDto(currency);
+    }
 
     /**
-     * Partially updates a currency.
+     * Partially update a currency.
      *
      * @param currencyDTO the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<CurrencyDTO> partialUpdate(CurrencyDTO currencyDTO);
+    public Optional<CurrencyDTO> partialUpdate(CurrencyDTO currencyDTO) {
+        log.debug("Request to partially update Currency : {}", currencyDTO);
+
+        return currencyRepository
+            .findById(currencyDTO.getId())
+            .map(existingCurrency -> {
+                currencyMapper.partialUpdate(existingCurrency, currencyDTO);
+
+                return existingCurrency;
+            })
+            .map(currencyRepository::save)
+            .map(currencyMapper::toDto);
+    }
 
     /**
      * Get all the currencies.
@@ -41,20 +91,31 @@ public interface CurrencyService {
      * @param pageable the pagination information.
      * @return the list of entities.
      */
-    Page<CurrencyDTO> findAll(Pageable pageable);
+    @Transactional(readOnly = true)
+    public Page<CurrencyDTO> findAll(Pageable pageable) {
+        log.debug("Request to get all Currencies");
+        return currencyRepository.findAll(pageable).map(currencyMapper::toDto);
+    }
 
     /**
-     * Get the "id" currency.
+     * Get one currency by id.
      *
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<CurrencyDTO> findOne(Long id);
+    @Transactional(readOnly = true)
+    public Optional<CurrencyDTO> findOne(Long id) {
+        log.debug("Request to get Currency : {}", id);
+        return currencyRepository.findById(id).map(currencyMapper::toDto);
+    }
 
     /**
-     * Delete the "id" currency.
+     * Delete the currency by id.
      *
      * @param id the id of the entity.
      */
-    void delete(Long id);
+    public void delete(Long id) {
+        log.debug("Request to delete Currency : {}", id);
+        currencyRepository.deleteById(id);
+    }
 }

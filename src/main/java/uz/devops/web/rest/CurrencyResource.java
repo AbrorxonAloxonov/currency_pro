@@ -1,16 +1,21 @@
 package uz.devops.web.rest;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -19,17 +24,19 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 import uz.devops.domain.Currency;
 import uz.devops.repository.CurrencyRepository;
+import uz.devops.service.CurrencyQueryService;
 import uz.devops.service.CurrencyService;
 import uz.devops.service.CurrencyServiceResolvers;
+import uz.devops.service.criteria.CurrencyCriteria;
 import uz.devops.service.dto.CurrencyDTO;
 import uz.devops.service.dto.CurrencyRequestDTO;
 import uz.devops.service.dto.ResponseDto;
-import uz.devops.service.mapper.CurrencyMapper;
 import uz.devops.web.rest.errors.BadRequestAlertException;
 
 /**
  * REST controller for managing {@link uz.devops.domain.Currency}.
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 public class CurrencyResource {
@@ -40,27 +47,23 @@ public class CurrencyResource {
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-    private final CurrencyMapper currencyMapper;
 
     private final CurrencyService currencyService;
 
     private final CurrencyRepository currencyRepository;
+
+    private final CurrencyQueryService currencyQueryService;
     private final CurrencyServiceResolvers currencyServiceResolvers;
 
-    public CurrencyResource(CurrencyMapper currencyMapper, CurrencyService currencyService, CurrencyRepository currencyRepository, CurrencyServiceResolvers currencyServiceResolvers) {
-        this.currencyMapper = currencyMapper;
-        this.currencyService = currencyService;
-        this.currencyRepository = currencyRepository;
-        this.currencyServiceResolvers = currencyServiceResolvers;
-    }
 
     /**
      * {@code POST  /currencies} : Create a new currency.
      *
-     //* @param  currencyDTO to create.
+     //* @param currencyDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new currencyDTO, or with status {@code 400 (Bad Request)} if the currency has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+
     @PostMapping("/currencies")
     public ResponseDto<List<CurrencyDTO>> createCurrency() throws URISyntaxException {
         RestTemplate restTemplate = new RestTemplate();
@@ -70,7 +73,7 @@ public class CurrencyResource {
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<CurrencyDTO>>() {}
-             ).getBody();
+            ).getBody();
         log.debug("transferred to the service for storage");
         currencyDtos = currencyService.saveAll(currencyDtos);
         if (currencyDtos == null){
@@ -155,24 +158,30 @@ public class CurrencyResource {
      * {@code GET  /currencies} : get all the currencies.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of currencies in body.
      */
     @GetMapping("/currencies")
-    public ResponseEntity<List<CurrencyDTO>> getAllCurrencies(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Currencies");
-        Page<CurrencyDTO> page = currencyService.findAll(pageable);
+    public ResponseEntity<List<CurrencyDTO>> getAllCurrencies(
+        CurrencyCriteria criteria,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Currencies by criteria: {}", criteria);
+        Page<CurrencyDTO> page = currencyQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
-    @GetMapping("/currenciesCcy/{ccy}")
-    public ResponseDto<List<CurrencyDTO>> getAllCurrenciesByBankName(@PathVariable String ccy){
-        log.debug("Search by ccy");
-        return currencyServiceResolvers.findByCcy(ccy);
-    }
-    @GetMapping("/currency")
-    public ResponseDto<List<Currency>> getAllByCurrency(@RequestBody CurrencyRequestDTO currencyRequestDTO){
-        log.debug("start resolveGetCurrencyService");
-        return currencyServiceResolvers.resolveGetCurrencyService(currencyRequestDTO);
+
+    /**
+     * {@code GET  /currencies/count} : count all the currencies.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/currencies/count")
+    public ResponseEntity<Long> countCurrencies(CurrencyCriteria criteria) {
+        log.debug("REST request to count Currencies by criteria: {}", criteria);
+        return ResponseEntity.ok().body(currencyQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -186,6 +195,16 @@ public class CurrencyResource {
         log.debug("REST request to get Currency : {}", id);
         Optional<CurrencyDTO> currencyDTO = currencyService.findOne(id);
         return ResponseUtil.wrapOrNotFound(currencyDTO);
+    }
+    @GetMapping("/currenciesCcy/{ccy}")
+    public ResponseDto<List<CurrencyDTO>> getAllCurrenciesByBankName(@PathVariable String ccy){
+        log.debug("Search by ccy");
+        return currencyServiceResolvers.findByCcy(ccy);
+    }
+    @GetMapping("/currencyByRequestDto")
+    public ResponseDto<List<Currency>> getAllByCurrency(@RequestBody CurrencyRequestDTO currencyRequestDTO){
+        log.debug("start resolveGetCurrencyService");
+        return currencyServiceResolvers.resolveGetCurrencyService(currencyRequestDTO);
     }
 
     /**

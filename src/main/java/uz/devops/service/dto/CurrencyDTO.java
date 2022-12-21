@@ -13,7 +13,6 @@ import java.util.Objects;
 public class CurrencyDTO implements Serializable {
 
     private Long id;
-
     @JsonProperty("Code")
     private String code;
 
